@@ -81,11 +81,6 @@ impl WallFlowService {
         Ok(())
     }
 
-    /// Stop the service
-    pub fn stop(&self) {
-        self.running.store(false, Ordering::Relaxed);
-    }
-
     /// Print startup information
     fn print_startup_info(&self) {
         info!("════════════════════════════════════════════════════════════════");

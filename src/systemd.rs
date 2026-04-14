@@ -179,13 +179,3 @@ pub fn is_service_enabled() -> bool {
         })
         .unwrap_or(false)
 }
-
-/// Get service status
-pub fn get_service_status() -> Result<String> {
-    let output = Command::new("systemctl")
-        .args(["--user", "status", "wallflow.service", "--no-pager"])
-        .output()
-        .context("Failed to get service status")?;
-
-    Ok(String::from_utf8_lossy(&output.stdout).to_string())
-}

@@ -31,7 +31,7 @@ pub fn get_random_wallpaper(dir: &PathBuf) -> Result<Option<PathBuf>> {
         return Ok(None);
     }
 
-    wallpapers.shuffle(&mut rand::thread_rng());
+    wallpapers.shuffle(&mut rand::rng());
     Ok(Some(wallpapers.remove(0)))
 }
 
@@ -109,7 +109,13 @@ pub fn change_wallpaper_hyprctl(
     if preload_status.status.success() {
         tracing::info!("✓ Preloaded: {}", wallpaper.display());
     } else {
-        anyhow::bail!("Failed to preload wallpaper");
+        let stderr = String::from_utf8_lossy(&preload_status.stderr);
+        anyhow::bail!(
+            "Failed to preload wallpaper '{}'. \
+            This usually means: 1) File doesn't exist, 2) hyprpaper is not running, 3) Permission denied. \
+            File: {}, stderr: {}",
+            wallpaper.display(), wallpaper.display(), stderr
+        );
     }
 
     // Set wallpaper
@@ -123,7 +129,13 @@ pub fn change_wallpaper_hyprctl(
         tracing::info!("✓ Changed wallpaper to: {}", wallpaper.display());
         Ok(())
     } else {
-        anyhow::bail!("Failed to set wallpaper");
+        let stderr = String::from_utf8_lossy(&set_status.stderr);
+        anyhow::bail!(
+            "Failed to set wallpaper '{}'. \
+            Check if: 1) Monitor '{}' exists, 2) hyprpaper is running, 3) Wallpaper was preloaded. \
+            Monitor: {}, stderr: {}",
+            wallpaper.display(), monitor, monitor, stderr
+        );
     }
 }
 
@@ -146,7 +158,13 @@ pub fn change_wallpaper_socket(
     if preload_output.status.success() {
         tracing::info!("✓ Preloaded: {}", wallpaper.display());
     } else {
-        anyhow::bail!("Failed to preload wallpaper");
+        let stderr = String::from_utf8_lossy(&preload_output.stderr);
+        anyhow::bail!(
+            "Failed to communicate via socket. \
+            Ensure: 1) socat is installed, 2) HYPRLAND_INSTANCE_SIGNATURE is set, 3) hyprpaper is running. \
+            Socket path: {}, stderr: {}",
+            socket_path, stderr
+        );
     }
 
     // Set wallpaper
@@ -161,7 +179,13 @@ pub fn change_wallpaper_socket(
         tracing::info!("✓ Changed wallpaper to: {}", wallpaper.display());
         Ok(())
     } else {
-        anyhow::bail!("Failed to set wallpaper");
+        let stderr = String::from_utf8_lossy(&set_output.stderr);
+        anyhow::bail!(
+            "Failed to set wallpaper via socket. \
+            Check: 1) Monitor '{}' is valid, 2) Socket path is correct, 3) hyprpaper is running. \
+            Socket: {}, stderr: {}",
+            monitor, socket_path, stderr
+        );
     }
 }
 
@@ -177,7 +201,13 @@ pub fn change_wallpaper_wtype() -> Result<()> {
         tracing::info!("✓ Triggered wallpaper change via wtype");
         Ok(())
     } else {
-        anyhow::bail!("Failed to trigger wallpaper change via wtype");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!(
+            "Failed to simulate keypress with wtype. \
+            Ensure: 1) wtype is installed, 2) Your Hyprland config has the keybind set (Ctrl+Super+Space), 3) The keybind works when tested manually. \
+            stderr: {}",
+            stderr
+        );
     }
 }
 
@@ -194,6 +224,12 @@ pub fn change_wallpaper_ydotool() -> Result<()> {
         tracing::info!("✓ Triggered wallpaper change via ydotool");
         Ok(())
     } else {
-        anyhow::bail!("Failed to trigger wallpaper change via ydotool");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!(
+            "Failed to simulate keypress with ydotool. \
+            Ensure: 1) ydotool is installed, 2) ydotool service is running (systemctl --user enable --now ydotool), 3) Your Hyprland config has the keybind set (Ctrl+Super+Space), 4) The keybind works when tested manually. \
+            stderr: {}",
+            stderr
+        );
     }
 }

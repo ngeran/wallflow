@@ -70,6 +70,37 @@ sudo pacman -S ydotool
 sudo systemctl enable --now ydotool
 ```
 
+### Verify Prerequisites
+
+Before installing, verify your system has the required dependencies:
+
+```bash
+# Check Hyprland
+hyprctl --version
+
+# Check hyprpaper
+hyprctl hyprpaper listloaded
+
+# Check Rust toolchain (must be >= 1.70.0)
+rustc --version
+cargo --version
+
+# Check systemd
+systemctl --user --version
+
+# Method-specific checks
+which omarchy-theme-bg-next  # For omarchy method
+which socat                  # For socket method
+which wtype                  # For wtype method
+which ydotool                # For ydotool method
+```
+
+**Install Rust if missing:**
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+```
+
 ---
 
 ## 🚀 Installation
@@ -85,7 +116,7 @@ wallflow install --method omarchy --interval 180
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/wallflow.git
+   git clone https://github.com/ngeran/wallflow.git
    cd wallflow
    ```
 
@@ -115,6 +146,51 @@ wallflow install --method omarchy --interval 180
 
 ---
 
+## 🔧 PATH Configuration
+
+If `wallflow` commands fail with "command not found", you need to add cargo binaries to your PATH.
+
+### Check if PATH is configured:
+```bash
+which wallflow
+echo $PATH | grep -E "\.cargo|\.local"
+```
+
+### Add to PATH (choose one method):
+
+**Method 1: Temporary (current session only)**
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Method 2: Permanent (add to ~/.bashrc)**
+```bash
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**Method 3: For mise users**
+If you're using mise to manage Rust, the cargo bin may not be in your PATH. Add this alias:
+```bash
+echo 'alias wallflow=~/.cargo/bin/wallflow' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**Method 4: Manual installation to ~/.local/bin**
+```bash
+cp target/release/wallflow ~/.local/bin/
+chmod +x ~/.local/bin/wallflow
+# Ensure ~/.local/bin is in your PATH
+```
+
+Verify:
+```bash
+which wallflow
+wallflow --version
+```
+
+---
+
 ## ✅ Verify Installation
 
 After installation, verify everything is working:
@@ -127,6 +203,8 @@ which wallflow
 wallflow --version
 # Should output: wallflow 5.0.0
 ```
+
+**If `which wallflow** fails with "command not found", see the [PATH Configuration](#-path-configuration) section above.
 
 ### 2. Check the service
 ```bash
@@ -368,6 +446,38 @@ systemctl --user list-units | grep wallflow
 ---
 
 ## 🔧 Troubleshooting
+
+### PATH Issues
+
+**Symptom:** `wallflow: command not found` or `command not found: wallflow`
+
+**Solutions:**
+
+1. **Check where wallflow is installed:**
+   ```bash
+   ls ~/.cargo/bin/wallflow      # If installed via cargo
+   ls ~/.local/bin/wallflow      # If installed manually
+   ```
+
+2. **Check your PATH:**
+   ```bash
+   echo $PATH | grep -o ~/.cargo/bin
+   echo $PATH | grep -o ~/.local/bin
+   ```
+
+3. **Add missing directory to PATH** (see [PATH Configuration](#-path-configuration) section)
+
+4. **For mise users:**
+   - mise manages PATH separately
+   - Use alias: `alias wallflow=~/.cargo/bin/wallflow`
+   - Or restart your shell to pick up mise changes
+
+5. **Verify shell configuration:**
+   ```bash
+   cat ~/.bashrc | grep cargo
+   source ~/.bashrc
+   which wallflow
+   ```
 
 ### Wallpapers aren't changing
 
@@ -614,7 +724,7 @@ After installation, WallFlow creates these files:
 
 ```bash
 # Build and install from source
-git clone https://github.com/your-username/wallflow.git
+git clone https://github.com/ngeran/wallflow.git
 cd wallflow
 cargo build --release
 cp target/release/wallflow ~/.local/bin/
@@ -645,7 +755,7 @@ wallflow tui
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/wallflow.git
+git clone https://github.com/ngeran/wallflow.git
 cd wallflow
 
 # Build release version

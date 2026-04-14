@@ -261,7 +261,7 @@ impl App {
 
     /// Draw the UI
     pub fn draw(&mut self, frame: &mut Frame) {
-        let size = frame.size();
+        let size = frame.area();
 
         // Main layout
         let chunks = Layout::default()

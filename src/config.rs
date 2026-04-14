@@ -33,17 +33,6 @@ impl WallpaperMethod {
             WallpaperMethod::Ydotool => "ydotool",
         }
     }
-
-    pub fn from_str(s: &str) -> Result<Self> {
-        match s.to_lowercase().as_str() {
-            "omarchy" => Ok(WallpaperMethod::Omarchy),
-            "hyprctl" => Ok(WallpaperMethod::Hyprctl),
-            "socket" => Ok(WallpaperMethod::Socket),
-            "wtype" => Ok(WallpaperMethod::Wtype),
-            "ydotool" => Ok(WallpaperMethod::Ydotool),
-            _ => anyhow::bail!("Unknown wallpaper method: {}", s),
-        }
-    }
 }
 
 /// Wallpaper directory configuration

@@ -1,4 +1,3 @@
-use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -70,7 +69,3 @@ impl From<WallpaperMethodArg> for crate::config::WallpaperMethod {
     }
 }
 
-pub fn parse_args() -> Result<Command> {
-    let cli = Cli::parse();
-    Ok(cli.command)
-}
